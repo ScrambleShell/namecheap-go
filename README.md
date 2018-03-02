@@ -1,31 +1,55 @@
 # go-namecheap
 
-A Go library for using [the Namecheap API](https://www.namecheap.com/support/api/intro.aspx).
-
-**Build Status:** [![Build Status](https://travis-ci.org/billputer/go-namecheap.png?branch=master)](https://travis-ci.org/billputer/go-namecheap)
+A Go library for using [the Namecheap XML REST API](https://www.namecheap.com/support/api/intro.aspx).
 
 ## Examples
 
 ```go
 package main
+
 import (
-  "fmt"
-  namecheap "github.com/billputer/go-namecheap"
+	"fmt"
+
+	. "github.com/hackwave/color"
+	namecheap "github.com/galaxyblack/namecheap-go"
 )
 
+type Domain struct {
+	name string
+}
+
+type Account struct {
+	username string
+	// Use Memguard to protect the password by clearing the memory after using it
+	password string
+	apiToken string
+	domains  []Domain
+}
+
 func main() {
-  apiUser := "billwiens"
-  apiToken := "xxxxxxx"
-  userName := "billwiens"
+	// TODO: Use surf (and otto if necesssary) to login and generate an API token if neccessary and 
 
-  client := namecheap.NewClient(apiUser, apiToken, userName)
+	account := Account{
+		username: "kosmosblack",
+		apiToken: "{API_TOKEN}",
+	}
 
-  // Get a list of your domains
-  domains, _ := client.DomainsGetList()
-  for _, domain := range domains {
-    fmt.Printf("Domain: %+v\n\n", domain.Name)
-  }
+	client := namecheap.NewClient(account.username, account.apiToken, account.username)
 
+	fmt.Println(Magenta("Namecheap Domains"))
+	fmt.Println(Gray("================="))
+
+	fmt.Println(Gray("Looking up domains for the API account: "), Green(account.username))
+	// Get a list of your domains
+	domains, err := client.DomainsGetList(1, 100)
+	if err != nil {
+		fmt.Println(Red("[Error]"), err)
+	}
+
+	fmt.Println(Gray("Number of found domains: "), Green(len(domains)))
+	for _, domain := range domains {
+		fmt.Printf("Domain: %+v\n\n", domain.Name)
+	}
 }
 ```
 

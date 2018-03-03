@@ -11,7 +11,7 @@ import (
 	"fmt"
 
 	. "github.com/hackwave/color"
-	namecheap "github.com/galaxyblack/namecheap-go"
+	namecheap "github.com/scrambleshell/namecheap-go"
 )
 
 type Domain struct {
@@ -53,15 +53,3 @@ func main() {
 }
 ```
 
-For more complete documentation, load up godoc and find the package.
-
-## Development
-
-- Source hosted at [GitHub](https://github.com/billputer/go-namecheap)
-- Report issues and feature requests to [GitHub Issues](https://github.com/billputer/go-namecheap/issues)
-
-Pull requests welcome!
-
-## Attribution
-
-Most concepts and code borrowed from the excellent [go-dnsimple](http://github.com/rubyist/go-dnsimple).

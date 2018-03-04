@@ -56,7 +56,11 @@ type ApiResponse struct {
 	WhoisguardEnable   whoisguardEnableResult    `xml:"CommandResponse>WhoisguardEnableResult"`
 	WhoisguardDisable  whoisguardDisableResult   `xml:"CommandResponse>WhoisguardDisableResult"`
 	WhoisguardRenew    *WhoisguardRenewResult    `xml:"CommandResponse>WhoisguardRenewResult"`
-	Errors             ApiErrors                 `xml:"Errors>Error"`
+	TotalItems         *TotalItems               `xml:"CommandResponse>Paging>TotalItems"`
+	CurrentPage        *CurrentPage              `xml:"CommandResponse>Paging>CurrentPage"`
+	PageSize           *PageSize                 `xml:"CommandResponse>Paging>PageSize"`
+
+	Errors ApiErrors `xml:"Errors>Error"`
 }
 
 // ApiError is the format of the error returned in the api responses.

@@ -122,8 +122,8 @@ func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainG
 	}
 	fmt.Println("resp: ", resp)
 	paging := Paging{
-		TotalItems:  resp.params.Get("TotalItems"),
-		CurrentPage: resp.params.Get("CurrentPage"),
+		TotalItems:  resp.TotalItems,
+		CurrentPage: resp.param,
 		PageSize:    resp.params.Get("PageSize"),
 	}
 	fmt.Println("PAGING:")
@@ -167,7 +167,7 @@ func (client *Client) DomainsCheck(domainNames ...string) ([]DomainCheckResult, 
 	return resp.DomainsCheck, nil
 }
 
-func (client *Client) DomainsTLDList() ([]TLDListResult, pagin, error) {
+func (client *Client) DomainsTLDList() ([]TLDListResult, Paging, error) {
 	requestInfo := &ApiRequest{
 		command: domainsTLDList,
 		method:  "POST",

@@ -104,34 +104,41 @@ type DomainCreateOption struct {
 	Nameservers       []string
 }
 
+func (client *Client) DomainsGetCount() (int, err) {
+	resp, err := client.DomainsListAPIRequest(1, 1)
+	if err != nil {
+		return nil, err
+	}
+	return resp.TotalItems
+}
+
+// TODO: These function names are kinda awful, a overhaul of the library should address renaming these to give
+// a more readable API and library usage that is intiutive
 func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainGetListResult, Paging, error) {
-	if pageSize > 100 {
-		// Maximum page size supported by the Namecheap API
-		pageSize = 100
-	}
-	requestInfo := &ApiRequest{
-		command: domainsGetList,
-		method:  "POST",
-		params:  url.Values{},
-	}
-	requestInfo.params.Set("CurrentPage", strconv.Itoa(int(currentPage)))
-	requestInfo.params.Set("PageSize", strconv.Itoa(int(pageSize)))
-	resp, err := client.do(requestInfo)
+	//resp, err := client.DomainsListAPIRequest(currentPage, pageSize)
+	//return resp.Domains, paging, nil
+	return client.DomainsListAPIRequest(currentPage, pageSize)
+}
+
+func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, err error) {
+	resp, err := client.DomainsListAPIRequest(1, 100)
 	if err != nil {
 		return nil, Paging{}, err
 	}
-	fmt.Println("resp: ", resp)
-	paging := Paging{
-		TotalItems:  resp.TotalItems,
-		CurrentPage: resp.CurrentPage,
-		PageSize:    resp.PageSize,
-	}
-	fmt.Println("PAGING:")
-	fmt.Println("Total Items  : ", paging.TotalItems)
-	fmt.Println("Current Page : ", paging.CurrentPage)
-	fmt.Println("Page Size    : ", paging.PageSize)
 
-	return resp.Domains, paging, nil
+	domains = append(domains, resp.Domains)
+	if resp.TotalItems > 100 {
+		remaining = resp.TotalItems - 100
+		// okay what do we do if there are 450 left?
+		quotient := remaining / 100 // integer division, decimals are truncated
+		if quotient != 0 {
+			for i := 0; i < quotient; i++ {
+				// TODO: API Requests
+			}
+		}
+		remainder := numerator % denominator
+	}
+
 }
 
 func (client *Client) DomainGetInfo(domainName string) (*DomainInfo, error) {

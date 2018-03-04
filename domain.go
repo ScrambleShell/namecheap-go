@@ -118,7 +118,7 @@ func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainG
 	requestInfo.params.Set("PageSize", strconv.Itoa(int(pageSize)))
 	resp, err := client.do(requestInfo)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	fmt.Println("resp: ", resp)
 	paging := Paging{
@@ -167,7 +167,7 @@ func (client *Client) DomainsCheck(domainNames ...string) ([]DomainCheckResult, 
 	return resp.DomainsCheck, nil
 }
 
-func (client *Client) DomainsTLDList() ([]TLDListResult, error) {
+func (client *Client) DomainsTLDList() ([]TLDListResult, pagin, error) {
 	requestInfo := &ApiRequest{
 		command: domainsTLDList,
 		method:  "POST",
@@ -176,10 +176,10 @@ func (client *Client) DomainsTLDList() ([]TLDListResult, error) {
 
 	resp, err := client.do(requestInfo)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return resp.TLDList, nil
+	return resp.TLDList, nil, nil
 }
 
 func (client *Client) DomainCreate(domainName string, years int, options ...DomainCreateOption) (*DomainCreateResult, error) {

@@ -9,44 +9,33 @@ package main
 
 import (
 	"fmt"
+	"os"
 
-	. "github.com/hackwave/color"
 	namecheap "github.com/scrambleshell/namecheap-go"
 )
 
-type Domain struct {
-	name string
-}
-
 type Account struct {
 	username string
-	// Use Memguard to protect the password by clearing the memory after using it
-	password string
 	apiToken string
-	domains  []Domain
 }
 
 func main() {
-	// TODO: Use surf (and otto if necesssary) to login and generate an API token if neccessary and 
+	fmt.Println("Namecheap Domains")
+	fmt.Println("=================")
 
 	account := Account{
-		username: "kosmosblack",
+		username: "{API_USERNAME}",
 		apiToken: "{API_TOKEN}",
 	}
-
 	client := namecheap.NewClient(account.username, account.apiToken, account.username)
 
-	fmt.Println(Magenta("Namecheap Domains"))
-	fmt.Println(Gray("================="))
-
-	fmt.Println(Gray("Looking up domains for the API account: "), Green(account.username))
-	// Get a list of your domains
+	fmt.Println("[Namecheap API] Requesting all domains registered by the user", account.username)
 	domains, err := client.DomainsGetList(1, 100)
 	if err != nil {
-		fmt.Println(Red("[Error]"), err)
+		fmt.Println("[Fatal Error]", err)
+		os.Exit(1)
 	}
 
-	fmt.Println(Gray("Number of found domains: "), Green(len(domains)))
 	for _, domain := range domains {
 		fmt.Printf("Domain: %+v\n\n", domain.Name)
 	}

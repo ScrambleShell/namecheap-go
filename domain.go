@@ -181,8 +181,8 @@ func (client *Client) DomainsTLDList() ([]TLDListResult, Paging, error) {
 	fmt.Println("resp: ", resp)
 	paging := Paging{
 		TotalItems:  resp.TotalItems,
-		CurrentPage: CurrentPage,
-		PageSize:    PageSize,
+		CurrentPage: resp.CurrentPage,
+		PageSize:    resp.PageSize,
 	}
 	fmt.Println("PAGING:")
 	fmt.Println("Total Items  : ", paging.TotalItems)

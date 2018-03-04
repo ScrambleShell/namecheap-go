@@ -1,6 +1,7 @@
-example.go
+examples/main.go
 
 .swp
 .swo
 
-
+src
+src/

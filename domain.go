@@ -2,6 +2,7 @@ package namecheap
 
 import (
 	"errors"
+	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
@@ -119,6 +120,7 @@ func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainG
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("resp: ", resp)
 	paging := Paging{
 		TotalItems:  resp.params.Get("TotalItems"),
 		CurrentPage: resp.params.Get("CurrentPage"),

@@ -29,6 +29,12 @@ type DomainGetListResult struct {
 	WhoisGuard string `xml:"WhoisGuard,attr"`
 }
 
+type Paging struct {
+	TotalItems  int `xml:"TotalItems,attr"`
+	CurrentPage int `xml:"CurrentPage,attr"`
+	PageSize    int `xml:"PageSize,attr"`
+}
+
 // DomainInfo represents the data returned by 'domains.getInfo'
 type DomainInfo struct {
 	ID         int        `xml:"ID,attr"`
@@ -97,7 +103,7 @@ type DomainCreateOption struct {
 	Nameservers       []string
 }
 
-func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainGetListResult, error) {
+func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainGetListResult, Paging, error) {
 	if pageSize > 100 {
 		// Maximum page size supported by the Namecheap API
 		pageSize = 100
@@ -109,13 +115,21 @@ func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainG
 	}
 	requestInfo.params.Set("CurrentPage", strconv.Itoa(int(currentPage)))
 	requestInfo.params.Set("PageSize", strconv.Itoa(int(pageSize)))
-
 	resp, err := client.do(requestInfo)
 	if err != nil {
 		return nil, err
 	}
+	paging := Paging{
+		TotalItems:  resp.params.Get("TotalItems"),
+		CurrentPage: resp.params.Get("CurrentPage"),
+		PageSize:    resp.params.Get("PageSize"),
+	}
+	fmt.Println("PAGING:")
+	fmt.Println("Total Items  : ", paging.TotalItems)
+	fmt.Println("Current Page : ", paging.CurrentPage)
+	fmt.Println("Page Size    : ", paging.PageSize)
 
-	return resp.Domains, nil
+	return resp.Domains, paging, nil
 }
 
 func (client *Client) DomainGetInfo(domainName string) (*DomainInfo, error) {

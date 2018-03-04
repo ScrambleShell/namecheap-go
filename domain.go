@@ -118,7 +118,7 @@ func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainG
 	requestInfo.params.Set("PageSize", strconv.Itoa(int(pageSize)))
 	resp, err := client.do(requestInfo)
 	if err != nil {
-		return nil, nil, err
+		return nil, Paging{}, err
 	}
 	fmt.Println("resp: ", resp)
 	paging := Paging{
@@ -176,10 +176,20 @@ func (client *Client) DomainsTLDList() ([]TLDListResult, Paging, error) {
 
 	resp, err := client.do(requestInfo)
 	if err != nil {
-		return nil, nil, err
+		return nil, Paging{}, err
 	}
+	fmt.Println("resp: ", resp)
+	paging := Paging{
+		TotalItems:  resp.TotalItems,
+		CurrentPage: CurrentPage,
+		PageSize:    PageSize,
+	}
+	fmt.Println("PAGING:")
+	fmt.Println("Total Items  : ", paging.TotalItems)
+	fmt.Println("Current Page : ", paging.CurrentPage)
+	fmt.Println("Page Size    : ", paging.PageSize)
 
-	return resp.TLDList, nil, nil
+	return resp.TLDList, paging, nil
 }
 
 func (client *Client) DomainCreate(domainName string, years int, options ...DomainCreateOption) (*DomainCreateResult, error) {

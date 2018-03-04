@@ -15,6 +15,7 @@ const (
 	domainsCreate  = "namecheap.domains.create"
 	domainsTLDList = "namecheap.domains.getTldList"
 	domainsRenew   = "namecheap.domains.renew"
+	maxPerPage     = 100
 )
 
 // DomainGetListResult represents the data returned by 'domains.getList'
@@ -104,41 +105,51 @@ type DomainCreateOption struct {
 	Nameservers       []string
 }
 
-func (client *Client) DomainsGetCount() (int, err) {
-	resp, err := client.DomainsListAPIRequest(1, 1)
+func (client *Client) DomainsGetCount() (int, error) {
+	resp, _, err := client.DomainsListAPIRequest(1, 1)
 	if err != nil {
 		return nil, err
 	}
-	return resp.TotalItems
+	return paging.TotalItems, nil
 }
 
 // TODO: These function names are kinda awful, a overhaul of the library should address renaming these to give
 // a more readable API and library usage that is intiutive
 func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainGetListResult, Paging, error) {
-	//resp, err := client.DomainsListAPIRequest(currentPage, pageSize)
-	//return resp.Domains, paging, nil
-	return client.DomainsListAPIRequest(currentPage, pageSize)
+	resp, paging, err := client.DomainsListAPIRequest(currentPage, pageSize)
+	return resp.Domains, paging, err
 }
 
 func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, err error) {
-	resp, err := client.DomainsListAPIRequest(1, 100)
+	resp, _, err := client.DomainsListAPIRequest(1, maxPerPage)
 	if err != nil {
-		return nil, Paging{}, err
+		return nil, err
 	}
 
 	domains = append(domains, resp.Domains)
-	if resp.TotalItems > 100 {
-		remaining = resp.TotalItems - 100
-		// okay what do we do if there are 450 left?
-		quotient := remaining / 100 // integer division, decimals are truncated
+	if resp.TotalItems > maxPerPage {
+		remaining = (resp.TotalItems - maxPerPage)
+		quotient := (remaining / maxPerPage)
 		if quotient != 0 {
-			for i := 0; i < quotient; i++ {
-				// TODO: API Requests
+			// Start from 2 because the initial apge is scrapped to get the initial paging object
+			// and so +2 is added to quotient to request each page, and an additonal +1 to request
+			// the remainder
+			for currentPage := 2; currentPage < (quotient + 3); currentPage++ {
+				resp, _, err = client.DomainsListAPIRequest(currentPage, maxPerPage)
+				if err != nil {
+					return domains, err
+				}
+				domains = append(domains, resp.Domains)
 			}
+		} else {
+			resp, _, err = client.DomainsListAPIRequest(2, maxPerPage)
+			if err != nil {
+				return domains, err
+			}
+			domains = append(domains, resp.Domains)
 		}
-		remainder := numerator % denominator
 	}
-
+	return domains, nil
 }
 
 func (client *Client) DomainGetInfo(domainName string) (*DomainInfo, error) {
@@ -147,14 +158,12 @@ func (client *Client) DomainGetInfo(domainName string) (*DomainInfo, error) {
 		method:  "POST",
 		params:  url.Values{},
 	}
-
 	requestInfo.params.Set("DomainName", domainName)
 
 	resp, err := client.do(requestInfo)
 	if err != nil {
 		return nil, err
 	}
-
 	return resp.DomainInfo, nil
 }
 
@@ -174,7 +183,7 @@ func (client *Client) DomainsCheck(domainNames ...string) ([]DomainCheckResult, 
 	return resp.DomainsCheck, nil
 }
 
-func (client *Client) DomainsTLDList() ([]TLDListResult, Paging, error) {
+func (client *Client) DomainsTLDList(currentPage int) ([]TLDListResult, Paging, error) {
 	requestInfo := &ApiRequest{
 		command: domainsTLDList,
 		method:  "POST",

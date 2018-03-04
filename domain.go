@@ -123,8 +123,8 @@ func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainG
 	fmt.Println("resp: ", resp)
 	paging := Paging{
 		TotalItems:  resp.TotalItems,
-		CurrentPage: resp.param,
-		PageSize:    resp.params.Get("PageSize"),
+		CurrentPage: resp.CurrentPage,
+		PageSize:    resp.PageSize,
 	}
 	fmt.Println("PAGING:")
 	fmt.Println("Total Items  : ", paging.TotalItems)

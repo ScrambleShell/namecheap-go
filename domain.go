@@ -106,7 +106,7 @@ type DomainCreateOption struct {
 }
 
 func (client *Client) DomainsGetCount() (int, error) {
-	r, _, err := client.DomainsListAPIRequest(1, 1)
+	r, err := client.DomainsListAPIRequest(1, 1)
 	if err != nil {
 		return r.Paging.TotalItems, err
 	}
@@ -116,17 +116,17 @@ func (client *Client) DomainsGetCount() (int, error) {
 // TODO: These function names are kinda awful, a overhaul of the library should address renaming these to give
 // a more readable API and library usage that is intiutive
 func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainGetListResult, Paging, error) {
-	r, paging, err := client.DomainsListAPIRequest(currentPage, pageSize)
-	return r.Domains, paging, err
+	r, err := client.DomainsListAPIRequest(currentPage, pageSize)
+	return r.Domains, r.Paging, err
 }
 
 func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, err error) {
-	resp, _, err := client.DomainsListAPIRequest(1, maxPerPage)
+	r, err := client.DomainsListAPIRequest(1, maxPerPage)
 	if err != nil {
 		return nil, err
 	}
 
-	domains = append(domains, resp.Domains)
+	domains = append(domains, r.Domains)
 	if resp.TotalItems > maxPerPage {
 		remaining := (resp.TotalItems - maxPerPage)
 		quotient := (remaining / maxPerPage)
@@ -135,18 +135,18 @@ func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, e
 			// and so +2 is added to quotient to request each page, and an additonal +1 to request
 			// the remainder
 			for currentPage := 2; currentPage < (quotient + 3); currentPage++ {
-				resp, _, err = client.DomainsListAPIRequest(uint(currentPage), maxPerPage)
+				r, err = client.DomainsListAPIRequest(uint(currentPage), maxPerPage)
 				if err != nil {
 					return domains, err
 				}
-				domains = append(domains, resp.Domains)
+				domains = append(domains, r.Domains)
 			}
 		} else {
-			resp, _, err = client.DomainsListAPIRequest(2, maxPerPage)
+			r, err = client.DomainsListAPIRequest(2, maxPerPage)
 			if err != nil {
 				return domains, err
 			}
-			domains = append(domains, resp.Domains)
+			domains = append(domains, r.Domains)
 		}
 	}
 	return domains, nil
@@ -160,11 +160,11 @@ func (client *Client) DomainGetInfo(domainName string) (*DomainInfo, error) {
 	}
 	requestInfo.params.Set("DomainName", domainName)
 
-	resp, err := client.do(requestInfo)
+	r, err := client.do(requestInfo)
 	if err != nil {
 		return nil, err
 	}
-	return resp.DomainInfo, nil
+	return r.DomainInfo, nil
 }
 
 func (client *Client) DomainsCheck(domainNames ...string) ([]DomainCheckResult, error) {
@@ -175,12 +175,12 @@ func (client *Client) DomainsCheck(domainNames ...string) ([]DomainCheckResult, 
 	}
 
 	requestInfo.params.Set("DomainList", strings.Join(domainNames, ","))
-	resp, err := client.do(requestInfo)
+	r, err := client.do(requestInfo)
 	if err != nil {
 		return nil, err
 	}
 
-	return resp.DomainsCheck, nil
+	return r.DomainsCheck, nil
 }
 
 func (client *Client) DomainsTLDList(currentPage int) ([]TLDListResult, Paging, error) {
@@ -190,22 +190,17 @@ func (client *Client) DomainsTLDList(currentPage int) ([]TLDListResult, Paging, 
 		params:  url.Values{},
 	}
 
-	resp, err := client.do(requestInfo)
+	r, err := client.do(requestInfo)
 	if err != nil {
 		return nil, Paging{}, err
 	}
-	fmt.Println("resp: ", resp)
-	paging := Paging{
-		TotalItems:  resp.TotalItems,
-		CurrentPage: resp.CurrentPage,
-		PageSize:    resp.PageSize,
-	}
+	fmt.Println("response: ", r)
 	fmt.Println("PAGING:")
-	fmt.Println("Total Items  : ", paging.TotalItems)
-	fmt.Println("Current Page : ", paging.CurrentPage)
-	fmt.Println("Page Size    : ", paging.PageSize)
+	fmt.Println("Total Items  : ", r.Paging.TotalItems)
+	fmt.Println("Current Page : ", r.Paging.CurrentPage)
+	fmt.Println("Page Size    : ", r.Paging.PageSize)
 
-	return resp.TLDList, paging, nil
+	return r.TLDList, r.Paging, nil
 }
 
 func (client *Client) DomainCreate(domainName string, years int, options ...DomainCreateOption) (*DomainCreateResult, error) {
@@ -236,12 +231,12 @@ func (client *Client) DomainCreate(domainName string, years int, options ...Doma
 		return nil, err
 	}
 
-	resp, err := client.do(requestInfo)
+	r, err := client.do(requestInfo)
 	if err != nil {
 		return nil, err
 	}
 
-	return resp.DomainCreate, nil
+	return r.DomainCreate, nil
 }
 
 func (client *Client) DomainRenew(domainName string, years int) (*DomainRenewResult, error) {

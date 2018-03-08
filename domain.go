@@ -116,8 +116,8 @@ func (client *Client) DomainsGetCount() (int, error) {
 // TODO: These function names are kinda awful, a overhaul of the library should address renaming these to give
 // a more readable API and library usage that is intiutive
 func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainGetListResult, Paging, error) {
-	resp, paging, err := client.DomainsListAPIRequest(currentPage, pageSize)
-	return resp.Domains, paging, err
+	r, paging, err := client.DomainsListAPIRequest(currentPage, pageSize)
+	return r.Domains, paging, err
 }
 
 func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, err error) {

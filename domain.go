@@ -196,11 +196,11 @@ func (client *Client) DomainsTLDList(currentPage int) ([]TLDListResult, Paging, 
 	}
 	fmt.Println("response: ", r)
 	fmt.Println("PAGING:")
-	fmt.Println("Total Items  : ", r.Paging.TotalItems)
-	fmt.Println("Current Page : ", r.Paging.CurrentPage)
-	fmt.Println("Page Size    : ", r.Paging.PageSize)
+	fmt.Println("Total Items  : ", r.TotalItems)
+	fmt.Println("Current Page : ", r.CurrentPage)
+	fmt.Println("Page Size    : ", r.PageSize)
 
-	return r.TLDList, r.Paging, nil
+	return r.TLDList, Paging{TotalItems: r.TotalItems, CurrentPage: r.CurrentPage, PageSize: r.PageSize}, nil
 }
 
 func (client *Client) DomainCreate(domainName string, years int, options ...DomainCreateOption) (*DomainCreateResult, error) {

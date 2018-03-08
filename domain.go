@@ -134,7 +134,7 @@ func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, e
 			// Start from 2 because the initial apge is scrapped to get the initial paging object
 			// and so +2 is added to quotient to request each page, and an additonal +1 to request
 			// the remainder
-			for currentPage := 2; currentPage < uint(quotient+3); currentPage++ {
+			for currentPage := 2; uint(currentPage) < (quotient + 3); currentPage++ {
 				r, err = client.DomainsListAPIRequest(uint(currentPage), maxPerPage)
 				if err != nil {
 					return domains, err

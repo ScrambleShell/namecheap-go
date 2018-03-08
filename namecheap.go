@@ -56,9 +56,9 @@ type ApiResponse struct {
 	WhoisguardEnable   whoisguardEnableResult    `xml:"CommandResponse>WhoisguardEnableResult"`
 	WhoisguardDisable  whoisguardDisableResult   `xml:"CommandResponse>WhoisguardDisableResult"`
 	WhoisguardRenew    *WhoisguardRenewResult    `xml:"CommandResponse>WhoisguardRenewResult"`
-	TotalItems         int                       `xml:"CommandResponse>Paging>TotalItems"`
-	CurrentPage        int                       `xml:"CommandResponse>Paging>CurrentPage"`
-	PageSize           int                       `xml:"CommandResponse>Paging>PageSize"`
+	TotalItems         uint                      `xml:"CommandResponse>Paging>TotalItems"`
+	CurrentPage        uint                      `xml:"CommandResponse>Paging>CurrentPage"`
+	PageSize           uint                      `xml:"CommandResponse>Paging>PageSize"`
 
 	Errors ApiErrors `xml:"Errors>Error"`
 }

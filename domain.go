@@ -108,16 +108,16 @@ type DomainCreateOption struct {
 func (client *Client) DomainsGetCount() (int, error) {
 	r, err := client.DomainsListAPIRequest(1, 1)
 	if err != nil {
-		return r.Paging.TotalItems, err
+		return r.TotalItems, err
 	}
-	return r.Paging.TotalItems, err
+	return r.TotalItems, err
 }
 
 // TODO: These function names are kinda awful, a overhaul of the library should address renaming these to give
 // a more readable API and library usage that is intiutive
 func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainGetListResult, Paging, error) {
 	r, err := client.DomainsListAPIRequest(currentPage, pageSize)
-	return r.Domains, r.Paging, err
+	return r.Domains, Paging{TotalItems: r.TotalItems, CurrentPage: r.CurrentPage, PageSize: r.PageSize}, err
 }
 
 func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, err error) {

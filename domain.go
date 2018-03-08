@@ -127,8 +127,8 @@ func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, e
 	}
 
 	domains = append(domains, r.Domains)
-	if resp.TotalItems > maxPerPage {
-		remaining := (resp.TotalItems - maxPerPage)
+	if r.TotalItems > maxPerPage {
+		remaining := (r.TotalItems - maxPerPage)
 		quotient := (remaining / maxPerPage)
 		if quotient != 0 {
 			// Start from 2 because the initial apge is scrapped to get the initial paging object

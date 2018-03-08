@@ -127,7 +127,7 @@ func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, e
 	}
 
 	fmt.Println("How many domains? ", len(r.Domains))
-	domains = append(domains, r.Domains)
+	domains = append(domains, r.Domains...)
 
 	if r.TotalItems > maxPerPage {
 		remaining := (r.TotalItems - maxPerPage)

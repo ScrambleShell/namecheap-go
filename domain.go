@@ -120,7 +120,7 @@ func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainG
 	return r.Domains, Paging{TotalItems: r.TotalItems, CurrentPage: r.CurrentPage, PageSize: r.PageSize}, err
 }
 
-func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, err error) {
+func (client *Client) DomainsGetCompleteList() (domains DomainGetListResult, err error) {
 	r, err := client.DomainsListAPIRequest(1, maxPerPage)
 	if err != nil {
 		return nil, err

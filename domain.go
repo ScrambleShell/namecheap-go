@@ -141,14 +141,14 @@ func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, e
 				if err != nil {
 					return domains, err
 				}
-				domains = append(domains, r.Domains)
+				domains = append(domains, r.Domains...)
 			}
 		} else {
 			r, err = client.DomainsListAPIRequest(2, maxPerPage)
 			if err != nil {
 				return domains, err
 			}
-			domains = append(domains, r.Domains)
+			domains = append(domains, r.Domains...)
 		}
 	}
 	return domains, nil

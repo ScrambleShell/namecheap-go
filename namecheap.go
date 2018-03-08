@@ -170,28 +170,26 @@ func (client *Client) sendRequest(request *ApiRequest) ([]byte, int, error) {
 	return buf, resp.StatusCode, nil
 }
 
-func (client *Client) DomainsListAPIRequest(currentPage uint, pageSize uint) (*APIResponse, Paging, error) {
+func (client *Client) DomainsListAPIRequest(currentPage uint, pageSize uint) (*ApiResponse, error) {
 	if pageSize > 100 {
 		pageSize = 100
 	} else if pageSize < 1 {
 		pageSize = 1
 	}
+
 	requestInfo := &ApiRequest{
 		command: domainsGetList,
 		method:  "POST",
 		params:  url.Values{},
 	}
+
 	requestInfo.params.Set("CurrentPage", strconv.Itoa(int(currentPage)))
 	requestInfo.params.Set("PageSize", strconv.Itoa(int(pageSize)))
+
 	resp, err := client.do(requestInfo)
 	if err != nil {
-		return nil, Paging{}, err
-	}
-	paging := Paging{
-		TotalItems:  resp.TotalItems,
-		CurrentPage: resp.CurrentPage,
-		PageSize:    resp.PageSize,
+		return nil, err
 	}
 
-	return resp, paging, err
+	return resp, err
 }

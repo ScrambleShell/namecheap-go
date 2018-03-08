@@ -130,7 +130,7 @@ func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, e
 	if len(r.Domains) > 1 {
 		domains = append(domains, r.Domains)
 	} else {
-		domains = append(domains, []r.Domains)
+		domains = append(domains, []DomainGetListResult{r.Domains})
 	}
 
 	if r.TotalItems > maxPerPage {

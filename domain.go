@@ -106,11 +106,11 @@ type DomainCreateOption struct {
 }
 
 func (client *Client) DomainsGetCount() (int, error) {
-	resp, _, err := client.DomainsListAPIRequest(1, 1)
+	r, _, err := client.DomainsListAPIRequest(1, 1)
 	if err != nil {
-		return nil, err
+		return r.Paging.TotalItems, err
 	}
-	return paging.TotalItems, nil
+	return r.Paging.TotalItems, err
 }
 
 // TODO: These function names are kinda awful, a overhaul of the library should address renaming these to give

@@ -187,5 +187,5 @@ func (client *Client) DomainsListAPIRequest(currentPage uint, pageSize uint) (Ap
 	requestInfo.params.Set("PageSize", strconv.Itoa(int(pageSize)))
 
 	resp, err := client.do(requestInfo)
-	return resp, err
+	return *(resp), err
 }

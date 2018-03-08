@@ -32,9 +32,9 @@ type DomainGetListResult struct {
 }
 
 type Paging struct {
-	TotalItems  int `xml:"TotalItems,attr"`
-	CurrentPage int `xml:"CurrentPage,attr"`
-	PageSize    int `xml:"PageSize,attr"`
+	TotalItems  uint `xml:"TotalItems,attr"`
+	CurrentPage uint `xml:"CurrentPage,attr"`
+	PageSize    uint `xml:"PageSize,attr"`
 }
 
 // DomainInfo represents the data returned by 'domains.getInfo'

@@ -120,13 +120,19 @@ func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainG
 	return r.Domains, Paging{TotalItems: r.TotalItems, CurrentPage: r.CurrentPage, PageSize: r.PageSize}, err
 }
 
-func (client *Client) DomainsGetCompleteList() (domains DomainGetListResult, err error) {
+func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, err error) {
 	r, err := client.DomainsListAPIRequest(1, maxPerPage)
 	if err != nil {
 		return nil, err
 	}
+
 	fmt.Println("How many domains? ", len(r.Domains))
-	domains = append(domains, r.Domains)
+	if len(r.Domains) > 1 {
+		domains = append(domains, r.Domains)
+	} else {
+		domains = append(domains, []r.Domains)
+	}
+
 	if r.TotalItems > maxPerPage {
 		remaining := (r.TotalItems - maxPerPage)
 		quotient := (remaining / maxPerPage)

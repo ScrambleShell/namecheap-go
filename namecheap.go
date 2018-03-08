@@ -170,7 +170,7 @@ func (client *Client) sendRequest(request *ApiRequest) ([]byte, int, error) {
 	return buf, resp.StatusCode, nil
 }
 
-func (client *Client) DomainsListAPIRequest(currentPage uint, pageSize uint) (*ApiResponse, error) {
+func (client *Client) DomainsListAPIRequest(currentPage uint, pageSize uint) (ApiResponse, error) {
 	if pageSize > 100 {
 		pageSize = 100
 	} else if pageSize < 1 {

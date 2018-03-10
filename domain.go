@@ -122,7 +122,11 @@ func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainG
 		//CurrentPage: r.CurrentPage,
 		//PageSize:    r.PageSize,
 	}
-	return r.Domains, p, err
+	if err != nil {
+		return nil, p, err
+	} else {
+		return r.Domains, p, nil
+	}
 }
 
 func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, err error) {

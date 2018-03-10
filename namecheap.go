@@ -186,6 +186,10 @@ func (client *Client) DomainsListAPIRequest(currentPage uint, pageSize uint) (*A
 	requestInfo.params.Set("CurrentPage", strconv.Itoa(int(currentPage)))
 	requestInfo.params.Set("PageSize", strconv.Itoa(int(pageSize)))
 
-	resp, err := client.do(requestInfo)
-	return resp, err
+	r, err := client.do(requestInfo)
+	if err != nil {
+		return nil, err
+	} else {
+		return r, nil
+	}
 }

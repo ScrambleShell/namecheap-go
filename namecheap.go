@@ -14,7 +14,58 @@ import (
 	"strings"
 )
 
-const defaultBaseURL = "https://api.namecheap.com/xml.response"
+const (
+	defaultBaseURL = "https://api.namecheap.com/xml.response"
+
+	// VALIDATION
+	validDomainCharacters = "abcdefghijklmnopqrstuvwxyz0123456789-"
+	// Number of domains to be listed on a page. Minimum value is 10, and maximum value is 100.
+	// Default Value: 20
+	// https://www.namecheap.com/support/api/methods/domains/get-list.aspx
+	minPerPage     = 10
+	maxPerPage     = 100
+	minCurrentPage = 1
+	maxCurrentPage = 999
+)
+
+// Namecheap API Global Paramters
+// https://www.namecheap.com/support/api/global-parameters.aspx
+
+// A map may be the best datatype to store this information so it can be easily printed
+// for the user
+//=================================================================================================
+// Name         Type    Max     Req     Description                                              //
+//=================================================================================================
+// ApiUser 	String 	20 	Yes 	Username required to access the API
+// ApiKey 	String 	50 	Yes 	Password required used to access the API
+// Command 	String 	80 	Yes 	Command for execution
+// UserName 	String 	20 	Yes 	The Username on which a command is executed.Generally,
+//                                      the values of ApiUser and UserName parameters are the same.
+// ClientIp 	String 	15 	Yes 	IP address of the client accessing your application
+//                                      (End-user IP address)
+//
+
+// Namecheap API Global Error Codes
+// https://www.namecheap.com/support/api/global-parameters.aspx
+
+// A map may be the best datatype to store this information so it can be easily printed
+// for the user
+
+//1010101 		Parameter APIUser is missing
+//1030408 		Unsupported authentication type
+//1010104 		Parameter Command is missing
+//1010102, 1011102 	Parameter APIKey is missing
+//1010105, 1011105 	Parameter ClientIP is missing
+//1050900 		Unknown error when validating APIUser
+//1011150 		Parameter RequestIP is invalid
+//1017150 		Parameter RequestIP is disabled or locked
+//1017105 		Parameter ClientIP is disabled or locked
+//1017101 		Parameter ApiUser is disabled or locked
+//1017410 		Too many declined payments
+//1017411 		Too many login attempts
+//1019103 		Parameter UserName is not available
+//1016103 		Parameter UserName is unauthorized
+//1017103 		Parameter UserName is disabled or locked
 
 // Client represents a client used to make calls to the Namecheap API.
 type Client struct {
@@ -84,6 +135,57 @@ func (errs ApiErrors) Error() string {
 	return errMsg
 }
 
+// VALIDATION
+func ValidDomainName(d string) bool {
+	for _, char := range d {
+		if !strings.Contains(validDomainCharacters, strings.ToLower(string(char))) {
+			return false
+		}
+	}
+	return true
+}
+
+func ValidatePageSize(pageSize uint) {
+	if pageSize > maxPerPage {
+		pageSize = maxPerPage
+	} else if pageSize < minPerPage {
+		pageSize = minPerPage
+	}
+}
+
+func ValidateCurrentPage(page uint) {
+	if page > maxCurrentPage {
+		page = maxCurrentPage
+	} else if pageSize < minCurrentPage {
+		page = minCurrentPage
+	}
+}
+
+func SearchTerm(searchTerm string) error {
+	if len(searchTerm) <= 1 {
+		searchTerm = ""
+	} else if len(searchTerm) >= 128 {
+		searchTerm = searchTerm[:128]
+	}
+	if ValidDomainName(searchTerm) {
+		return errors.New("invalid domain characters in search term")
+	}
+	return nil
+}
+
+func ValidateListType(listType string) {
+	if listType != ALL || listType != EXPIRING || listType != EXPIRED {
+		listType = ALL
+	}
+}
+
+func ValidateSortBy(sortBy string) {
+	if sortBy != NAME_ASC || sortBy != NAME_DESC || sortBy != EXPIRE_DATE_ASC || sortBy != EXPIRE_DATE_DESC || sortBy != CREATE_DATE_ASC || sortBy != CREATE_DATE_DESC {
+		sortBy = NAME_ASC
+	}
+}
+
+// API CLIENT
 func NewClient(apiUser, apiToken, userName string) *Client {
 	return &Client{
 		ApiUser:    apiUser,
@@ -170,12 +272,22 @@ func (client *Client) sendRequest(request *ApiRequest) ([]byte, int, error) {
 	return buf, resp.StatusCode, nil
 }
 
-func (client *Client) DomainsListAPIRequest(page uint, pageSize uint) (*ApiResponse, error) {
-	if pageSize > maxPerPage {
-		pageSize = maxPerPage
-	} else if pageSize < 1 {
-		pageSize = 1
-	}
+func (client *Client) DomainsListAPIRequest(page uint, pageSize uint, searchTerm, listType, sortBy string) (*ApiResponse, error) {
+	// VALIDATION
+	// [pageSize] must be equal or GREATER than 10
+	// [pageSize] must be equal or LESS than 100
+	ValidatePageSize(pageSize)
+	// [page] must be equal or GREATER than 1
+	// [page] must be qual or LESS than 999 (sanity)
+	ValidateCurrentPage(page)
+	// [searchTerm] must be alphanumeric
+	// [searchTerm] must have a length GREATER than 1
+	// [searchTerm] must have a length LESS than 128
+	ValidateSearchTerm(searchTerm)
+	// [listType] can only be ALL, EXPIRING, or EXPIRED (Default: ALL)
+	ValidateListType(listType)
+	// [sortBy] can only be NAME, NAME_DESC, EXPIREDATE, EXPIREDATE_DESC, CREATEDATE, CREATEDATE_DESC
+	ValidateSortBy(sortBy)
 
 	requestInfo := &ApiRequest{
 		command: domainsGetList,
@@ -192,8 +304,6 @@ func (client *Client) DomainsListAPIRequest(page uint, pageSize uint) (*ApiRespo
 	if &r == nil {
 		return nil, errors.New("Request struct failed to be assigned")
 	} else if &r.TotalItems == nil {
-		//fmt.Println("Error: Request Paging fields failed to be set. This is most likely due to a failure to successfully connect to the API.")
-		//fmt.Println("Check authorization, whitelisted IPs and related settings and try again.")
 		return nil, errors.New("Request fields related to Paging, specifically 'TotalItems', 'CurrentPage', and 'PageSize' failed to be assigned")
 	}
 	return r, nil

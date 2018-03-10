@@ -14,7 +14,19 @@ const (
 	domainsCreate  = "namecheap.domains.create"
 	domainsTLDList = "namecheap.domains.getTldList"
 	domainsRenew   = "namecheap.domains.renew"
-	maxPerPage     = 100
+	// Domain `ListType` Filter
+	// https://www.namecheap.com/support/api/methods/domains/get-list.aspx
+	ALL      = "ALL"
+	EXPIRING = "EXPIRING"
+	EXPIRED  = "EXPIRED"
+	// Domain `SortBy` Filter
+	// https://www.namecheap.com/support/api/methods/domains/get-list.aspx
+	NAME_ASC         = "NAME"
+	NAME_DESC        = "NAME_DESC"
+	EXPIRE_DATE_ASC  = "EXPIREDATE"
+	EXPIRE_DATE_DESC = "EXPIREDATE_DESC"
+	CREATE_DATE_ASC  = "CREATEDATE"
+	CREATE_DATE_DESC = "CREATEDATE_DESC"
 )
 
 // DomainGetListResult represents the data returned by 'domains.getList'

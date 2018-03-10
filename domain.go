@@ -2,7 +2,6 @@ package namecheap
 
 import (
 	"errors"
-	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
@@ -131,9 +130,7 @@ func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, e
 		return nil, err
 	}
 
-	fmt.Println("How many domains? ", len(r.Domains))
 	domains = append(domains, r.Domains...)
-
 	if r.TotalItems > maxPerPage {
 		remaining := (r.TotalItems - maxPerPage)
 		quotient := (remaining / maxPerPage)
@@ -201,12 +198,6 @@ func (client *Client) DomainsTLDList(currentPage int) ([]TLDListResult, Paging, 
 	if err != nil {
 		return nil, Paging{}, err
 	}
-	fmt.Println("response: ", r)
-	fmt.Println("PAGING:")
-	fmt.Println("Total Items  : ", r.TotalItems)
-	fmt.Println("Current Page : ", r.CurrentPage)
-	fmt.Println("Page Size    : ", r.PageSize)
-
 	return r.TLDList, Paging{TotalItems: r.TotalItems, CurrentPage: r.CurrentPage, PageSize: r.PageSize}, nil
 }
 

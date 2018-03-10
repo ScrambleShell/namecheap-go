@@ -182,14 +182,13 @@ func (client *Client) DomainsListAPIRequest(currentPage uint, pageSize uint) (*A
 		method:  "POST",
 		params:  url.Values{},
 	}
-
 	requestInfo.params.Set("CurrentPage", strconv.Itoa(int(currentPage)))
 	requestInfo.params.Set("PageSize", strconv.Itoa(int(pageSize)))
 
 	r, err := client.do(requestInfo)
 	if &r.TotalItems == nil || &r.CurrentPage == nil || &r.PageSize == nil {
-		fmt.Println("Error: Request Paging fields failed to be set. This is most likely due to a failure to successfully connect to the API.")
-		fmt.Println("Check authorization, whitelisted IPs and related settings and try again.")
+		//fmt.Println("Error: Request Paging fields failed to be set. This is most likely due to a failure to successfully connect to the API.")
+		//fmt.Println("Check authorization, whitelisted IPs and related settings and try again.")
 		err = errors.New("Request fields related to Paging, specifically 'TotalItems', 'CurrentPage', and 'PageSize' failed to be set.")
 	}
 	return r, err

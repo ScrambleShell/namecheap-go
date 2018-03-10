@@ -187,8 +187,6 @@ func (client *Client) DomainsListAPIRequest(currentPage uint, pageSize uint) (*A
 	requestInfo.params.Set("PageSize", strconv.Itoa(int(pageSize)))
 
 	r, err := client.do(requestInfo)
-	fmt.Println("r.CurrentPage: ", r.Paging)
-
 	if err != nil {
 		return nil, err
 	} else {

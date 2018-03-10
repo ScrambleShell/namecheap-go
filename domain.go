@@ -113,7 +113,7 @@ func (client *Client) DomainsGetCount() (uint, error) {
 }
 
 // TODO: These function names are kinda awful, a overhaul of the library should address renaming these to give
-// a more readable API and library usage that is intiutive
+// a more readable API and library usage that is intiutive, then alias to make it backwards compatible
 func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainGetListResult, Paging, error) {
 	r, err := client.DomainsListAPIRequest(currentPage, pageSize)
 	p := Paging{
@@ -144,6 +144,7 @@ func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, e
 					return domains, err
 				}
 				domains = append(domains, r.Domains...)
+				fmt.Println("List Length: ", len(domains))
 			}
 		} else {
 			r, err = client.DomainsListAPIRequest(2, maxPerPage)
@@ -151,6 +152,7 @@ func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, e
 				return domains, err
 			}
 			domains = append(domains, r.Domains...)
+			fmt.Println("List Length: ", len(domains))
 		}
 	}
 	return domains, nil

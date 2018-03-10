@@ -156,12 +156,12 @@ func ValidatePageSize(pageSize uint) {
 func ValidateCurrentPage(page uint) {
 	if page > maxCurrentPage {
 		page = maxCurrentPage
-	} else if pageSize < minCurrentPage {
+	} else if page < minCurrentPage {
 		page = minCurrentPage
 	}
 }
 
-func SearchTerm(searchTerm string) error {
+func ValidateSearchTerm(searchTerm string) error {
 	if len(searchTerm) <= 1 {
 		searchTerm = ""
 	} else if len(searchTerm) >= 128 {

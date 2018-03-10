@@ -116,10 +116,10 @@ type DomainCreateOption struct {
 	Nameservers       []string
 }
 
-func (client *Client) DomainsGetList() (uint, error) {
-	r, err := client.DomainsListAPIRequest(1, 1)
+func (client *Client) DomainCount() (uint, error) {
+	r, err := client.DomainsListAPIRequest(1, minPerPage, "", "", "")
 	if err != nil {
-		return r.TotalItems, err
+		return 0, err
 	}
 	return r.TotalItems, err
 }
@@ -127,7 +127,7 @@ func (client *Client) DomainsGetList() (uint, error) {
 // TODO: These function names are kinda awful, a overhaul of the library should address renaming these to give
 // a more readable API and library usage that is intiutive, then alias to make it backwards compatible
 func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainGetListResult, Paging, error) {
-	r, err := client.DomainsListAPIRequest(currentPage, pageSize)
+	r, err := client.DomainsListAPIRequest(currentPage, pageSize, "", "", "")
 	p := Paging{
 		TotalItems:  r.TotalItems,
 		CurrentPage: r.CurrentPage,
@@ -137,7 +137,7 @@ func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainG
 }
 
 func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, err error) {
-	r, err := client.DomainsListAPIRequest(1, maxPerPage)
+	r, err := client.DomainsListAPIRequest(1, maxPerPage, "", "", "")
 	if err != nil {
 		return nil, err
 	}
@@ -152,14 +152,14 @@ func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, e
 			// initial paging object and so +2 is added to quotient to request each page, and
 			// an additonal +1 to request the remainder
 			for currentPage := 2; uint(currentPage) < (quotient + 3); currentPage++ {
-				r, err = client.DomainsListAPIRequest(uint(currentPage), maxPerPage)
+				r, err = client.DomainsListAPIRequest(uint(currentPage), maxPerPage, "", "", "")
 				if err != nil {
 					return domains, err
 				}
 				domains = append(domains, r.Domains...)
 			}
 		} else {
-			r, err = client.DomainsListAPIRequest(2, maxPerPage)
+			r, err = client.DomainsListAPIRequest(2, maxPerPage, "", "", "")
 			if err != nil {
 				return domains, err
 			}

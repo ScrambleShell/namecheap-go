@@ -57,7 +57,7 @@ The `getList` functions in the current Namecheap API
     _getList_      — Gets the list of domain transfers. 
 
 ~~**ssl**~~
-*(Unncessary to implement, develoeprs should be encouraged to use ACME/Let's encrypt instead. It is a free SSL certificate provider, with easy automated certificate generation provided by the Mozilla project.)*
+*(Unncessary to implement, develoeprs should be encouraged to use ACME/Let's encrypt instead. It is a free SSL certificate provider, with easy automated certificate generation provided by the Mozilla project.)* Pull requests providing this functionality will be accepted if they meet quality requirements and fit within the existing code but no development time will be invested in this by the ScrambleSuit project.
     ~~create~~                 — Creates a new SSL certificate.
     ~~getList~~                — Returns a list of SSL certificates for the particular user.
     ~~parseCSR~~               — Parsers the CSR

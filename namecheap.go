@@ -16,7 +16,6 @@ import (
 
 const (
 	defaultBaseURL = "https://api.namecheap.com/xml.response"
-
 	// VALIDATION
 	validDomainCharacters = "abcdefghijklmnopqrstuvwxyz0123456789-"
 	// Number of domains to be listed on a page. Minimum value is 10, and maximum value is 100.
@@ -145,44 +144,48 @@ func ValidDomainName(d string) bool {
 	return true
 }
 
-func ValidatePageSize(pageSize uint) {
+func ValidatePageSize(pageSize uint) uint {
 	if pageSize > maxPerPage {
 		pageSize = maxPerPage
 	} else if pageSize < minPerPage {
 		pageSize = minPerPage
 	}
+	return pageSize
 }
 
-func ValidateCurrentPage(page uint) {
+func ValidateCurrentPage(page uint) uint {
 	if page > maxCurrentPage {
 		page = maxCurrentPage
 	} else if page < minCurrentPage {
 		page = minCurrentPage
 	}
+	return page
 }
 
-func ValidateSearchTerm(searchTerm string) error {
+func ValidateSearchTerm(searchTerm string) (string, error) {
 	if len(searchTerm) <= 1 {
 		searchTerm = ""
 	} else if len(searchTerm) >= 128 {
 		searchTerm = searchTerm[:128]
 	}
-	if ValidDomainName(searchTerm) {
-		return errors.New("invalid domain characters in search term")
+	if searchTerm != "" && ValidDomainName(searchTerm) {
+		return searchTerm, errors.New("invalid domain characters in search term")
 	}
-	return nil
+	return searchTerm, nil
 }
 
-func ValidateListType(listType string) {
+func ValidateListType(listType string) string {
 	if listType != ALL || listType != EXPIRING || listType != EXPIRED {
 		listType = ALL
 	}
+	return listType
 }
 
-func ValidateSortBy(sortBy string) {
+func ValidateSortBy(sortBy string) string {
 	if sortBy != NAME_ASC || sortBy != NAME_DESC || sortBy != EXPIRE_DATE_ASC || sortBy != EXPIRE_DATE_DESC || sortBy != CREATE_DATE_ASC || sortBy != CREATE_DATE_DESC {
 		sortBy = NAME_ASC
 	}
+	return sortBy
 }
 
 // API CLIENT
@@ -276,18 +279,21 @@ func (client *Client) DomainsListAPIRequest(page uint, pageSize uint, searchTerm
 	// VALIDATION
 	// [pageSize] must be equal or GREATER than 10
 	// [pageSize] must be equal or LESS than 100
-	ValidatePageSize(pageSize)
+	pageSize = ValidatePageSize(pageSize)
 	// [page] must be equal or GREATER than 1
 	// [page] must be qual or LESS than 999 (sanity)
-	ValidateCurrentPage(page)
+	page = ValidateCurrentPage(page)
 	// [searchTerm] must be alphanumeric
 	// [searchTerm] must have a length GREATER than 1
 	// [searchTerm] must have a length LESS than 128
-	ValidateSearchTerm(searchTerm)
+	searchTerm, err := ValidateSearchTerm(searchTerm)
+	if err != nil {
+		return nil, err
+	}
 	// [listType] can only be ALL, EXPIRING, or EXPIRED (Default: ALL)
-	ValidateListType(listType)
+	listType = ValidateListType(listType)
 	// [sortBy] can only be NAME, NAME_DESC, EXPIREDATE, EXPIREDATE_DESC, CREATEDATE, CREATEDATE_DESC
-	ValidateSortBy(sortBy)
+	sortBy = ValidateSortBy(sortBy)
 
 	requestInfo := &ApiRequest{
 		command: domainsGetList,

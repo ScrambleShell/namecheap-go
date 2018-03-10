@@ -117,7 +117,7 @@ type DomainCreateOption struct {
 }
 
 func (client *Client) DomainCount() (uint, error) {
-	r, err := client.DomainsListAPIRequest(1, minPerPage, "", "", "")
+	r, err := client.DomainsListAPIRequest(1, 1, "", "", "")
 	if err != nil {
 		return 0, err
 	}

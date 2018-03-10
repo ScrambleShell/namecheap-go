@@ -118,9 +118,9 @@ func (client *Client) DomainsGetCount() (uint, error) {
 func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainGetListResult, Paging, error) {
 	r, err := client.DomainsListAPIRequest(currentPage, pageSize)
 	p := Paging{
-		TotalItems:  r.TotalItems,
-		CurrentPage: r.CurrentPage,
-		PageSize:    r.PageSize,
+		//TotalItems:  r.TotalItems,
+		//CurrentPage: r.CurrentPage,
+		//PageSize:    r.PageSize,
 	}
 	return r.Domains, p, err
 }

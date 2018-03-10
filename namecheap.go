@@ -171,6 +171,7 @@ func (client *Client) sendRequest(request *ApiRequest) ([]byte, int, error) {
 }
 
 func (client *Client) DomainsListAPIRequest(currentPage uint, pageSize uint) (*ApiResponse, error) {
+	// This may be incorrect
 	if pageSize > 100 {
 		pageSize = 100
 	} else if pageSize < 1 {
@@ -182,14 +183,28 @@ func (client *Client) DomainsListAPIRequest(currentPage uint, pageSize uint) (*A
 		method:  "POST",
 		params:  url.Values{},
 	}
+
+	fmt.Println("*Trying* to set [currentPage] :  ", currentPage)
+	fmt.Println("*Trying* to set [pageSize] :     ", pageSize)
+
 	requestInfo.params.Set("CurrentPage", strconv.Itoa(int(currentPage)))
 	requestInfo.params.Set("PageSize", strconv.Itoa(int(pageSize)))
 
+	fmt.Println("*Trying* strconv [currentPage] :    ", strconv.Itoa(int(currentPage)))
+	fmt.Println("*Trying* strconv    [pageSize] :    ", strconv.Itoa(int(pageSize)))
+
 	r, err := client.do(requestInfo)
-	if &r.TotalItems == nil || &r.CurrentPage == nil || &r.PageSize == nil {
+	fmt.Println("What is the current page?", r.CurrentPage)
+	fmt.Println("What is the current page?", r.PageSize)
+	if err != nil {
+		return nil, err
+	}
+	if &r == nil {
+		return nil, errors.New("Request struct failed to be assigned")
+	} else if &r.TotalItems == nil {
 		//fmt.Println("Error: Request Paging fields failed to be set. This is most likely due to a failure to successfully connect to the API.")
 		//fmt.Println("Check authorization, whitelisted IPs and related settings and try again.")
-		err = errors.New("Request fields related to Paging, specifically 'TotalItems', 'CurrentPage', and 'PageSize' failed to be set.")
+		return nil, errors.New("Request fields related to Paging, specifically 'TotalItems', 'CurrentPage', and 'PageSize' failed to be assigned")
 	}
-	return r, err
+	return r, nil
 }

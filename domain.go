@@ -2,7 +2,6 @@ package namecheap
 
 import (
 	"errors"
-	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
@@ -131,47 +130,21 @@ func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, e
 		return nil, err
 	}
 
-	fmt.Println("Printing out the Paging information of the Request")
-	fmt.Println("r.TotalItems: ", r.TotalItems)
-	fmt.Println("==============")
-
-	// Instead of using a slice, we can use a map to enforce uniqueness then convert
-	// this map into a slice of domains before returning this object
-	domainMap := make(map[string]DomainGetListResult)
-
-	// Pull first 100 items
-	//domains = append(domains, r.Domains...)
 	// Load first 100 items into map
-	for _, d := range r.Domains {
-		domainMap[d.Name] = d
-	}
-	fmt.Println("Size of domain map is now: ", len(domainMap))
-
+	domains = append(domains, r.Domains...)
 	if r.TotalItems > maxPerPage {
-		fmt.Println("maxPerPage: ", maxPerPage)
-		fmt.Println("r.TotalItems: ", r.TotalItems)
 		remaining := (r.TotalItems - maxPerPage)
-		fmt.Println("Remaining: ", remaining)
 		quotient := (remaining / maxPerPage)
-		fmt.Println("Quotient: ", quotient)
 		if quotient != 0 {
-			// Start from 2 because the initial apge is scrapped to get the initial paging object
-			// and so +2 is added to quotient to request each page, and an additonal +1 to request
-			// the remainder
-			for currentPage := 1; uint(currentPage) < (quotient + 4); currentPage++ {
-				fmt.Println("+= [currentPage] being used is: ", currentPage)
-				fmt.Println("+= uint(currentPage) conversion OUTPUT: ", currentPage)
+			// Start from the second page because the initial apge is scrapped to get the
+			// initial paging object and so +2 is added to quotient to request each page, and
+			// an additonal +1 to request the remainder
+			for currentPage := 2; uint(currentPage) < (quotient + 3); currentPage++ {
 				r, err = client.DomainsListAPIRequest(uint(currentPage), maxPerPage)
-				fmt.Println("Length of domains pulled from DomainsListAPIRequest: ", len(r.Domains))
 				if err != nil {
 					return domains, err
 				}
 				domains = append(domains, r.Domains...)
-				fmt.Println("Domains Length: ", len(domains))
-				fmt.Println("Current Page: ", currentPage)
-				for _, d := range r.Domains {
-					domainMap[d.Name] = d
-				}
 			}
 		} else {
 			r, err = client.DomainsListAPIRequest(2, maxPerPage)
@@ -179,13 +152,8 @@ func (client *Client) DomainsGetCompleteList() (domains []DomainGetListResult, e
 				return domains, err
 			}
 			domains = append(domains, r.Domains...)
-			for _, d := range r.Domains {
-				domainMap[d.Name] = d
-			}
 		}
 	}
-
-	fmt.Println("Size of domain map is now: ", len(domainMap))
 	return domains, nil
 }
 

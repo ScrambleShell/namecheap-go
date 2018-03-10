@@ -170,10 +170,9 @@ func (client *Client) sendRequest(request *ApiRequest) ([]byte, int, error) {
 	return buf, resp.StatusCode, nil
 }
 
-func (client *Client) DomainsListAPIRequest(currentPage uint, pageSize uint) (*ApiResponse, error) {
-	// This may be incorrect
-	if pageSize > 100 {
-		pageSize = 100
+func (client *Client) DomainsListAPIRequest(page uint, pageSize uint) (*ApiResponse, error) {
+	if pageSize > maxPerPage {
+		pageSize = maxPerPage
 	} else if pageSize < 1 {
 		pageSize = 1
 	}
@@ -183,19 +182,10 @@ func (client *Client) DomainsListAPIRequest(currentPage uint, pageSize uint) (*A
 		method:  "POST",
 		params:  url.Values{},
 	}
-
-	fmt.Println("*Trying* to set [currentPage] :  ", currentPage)
-	fmt.Println("*Trying* to set [pageSize] :     ", pageSize)
-
-	requestInfo.params.Set("CurrentPage", strconv.Itoa(int(currentPage)))
-	requestInfo.params.Set("PageSize", strconv.Itoa(int(pageSize)))
-
-	fmt.Println("*Trying* strconv [currentPage] :    ", strconv.Itoa(int(currentPage)))
-	fmt.Println("*Trying* strconv    [pageSize] :    ", strconv.Itoa(int(pageSize)))
+	requestInfo.params.Set("page", strconv.Itoa(int(page)))
+	requestInfo.params.Set("pageSize", strconv.Itoa(int(pageSize)))
 
 	r, err := client.do(requestInfo)
-	fmt.Println("What is the current page?", r.CurrentPage)
-	fmt.Println("What is the current page?", r.PageSize)
 	if err != nil {
 		return nil, err
 	}

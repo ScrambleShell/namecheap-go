@@ -119,7 +119,7 @@ func (client *Client) DomainsGetList(currentPage uint, pageSize uint) ([]DomainG
 	r, err := client.DomainsListAPIRequest(currentPage, pageSize)
 	p := Paging{
 		//TotalItems:  r.TotalItems,
-		CurrentPage: r.CurrentPage,
+		//CurrentPage: r.CurrentPage,
 		//PageSize:    r.PageSize,
 	}
 	fmt.Println("response from domainlist api request with currentPage and pageSize passed")

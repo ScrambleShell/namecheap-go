@@ -116,7 +116,7 @@ type DomainCreateOption struct {
 	Nameservers       []string
 }
 
-func (client *Client) DomainsGetCount() (uint, error) {
+func (client *Client) DomainsGetList() (uint, error) {
 	r, err := client.DomainsListAPIRequest(1, 1)
 	if err != nil {
 		return r.TotalItems, err
